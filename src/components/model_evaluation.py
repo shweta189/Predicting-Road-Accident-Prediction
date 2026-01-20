@@ -104,26 +104,9 @@ class ModelEvaluation:
             x,y = test_df.drop(columns=[TARGET_COLUMN],axis=1), test_df[TARGET_COLUMN]
 
             logging.info("Test data loaded.")
-            num_features, cat_features = self.get_numerical_and_categorical_features()
             encoder = LabelEncoder()
             y = encoder.fit_transform(y)
 
-            num_pipeline = Pipeline([
-                ('imputer',SimpleImputer(strategy='median')),
-                ('scaler',StandardScaler())
-            ])
-            cat_pipeline = Pipeline([
-                ("imputer",SimpleImputer(strategy='most_frequent')),
-                ("ohe",OneHotEncoder(handle_unknown='ignore',sparse_output=False))
-            ])
-
-            preprocessor = ColumnTransformer(
-                transformers = [
-                    ("num",num_pipeline,num_features),
-                    ('cat',cat_pipeline,cat_features),
-                ]
-            )
-            x = preprocessor.fit_transform(x)
             trained_model = load_object(file_path=self.model_trainer_artifact.trained_model_file_path)
             logging.info("Trained model loaded/exist")
             trained_model_f1_score = self.model_trainer_artifact.metric_artifact.f1_score
